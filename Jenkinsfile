@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_USER = "shamanth"
-    }
-
     stages {
 
         stage('Clone Repository') {
@@ -16,9 +12,9 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 sh '''
-                docker build -t shamanth/user-service:latest ./user-service
-                docker build -t shamanth/order-service:latest ./order-service
-                docker build -t shamanth/payment-service:latest ./payment-service
+                docker build -t shamanth0411/user-service:latest ./user-service
+                docker build -t shamanth0411/order-service:latest ./order-service
+                docker build -t shamanth0411/payment-service:latest ./payment-service
                 '''
             }
         }
@@ -29,9 +25,9 @@ pipeline {
                     sh '''
                     echo $PASS | docker login -u $USER --password-stdin
 
-                    docker push shamanth/user-service:latest
-                    docker push shamanth/order-service:latest
-                    docker push shamanth/payment-service:latest
+                    docker push shamanth0411/user-service:latest
+                    docker push shamanth0411/order-service:latest
+                    docker push shamanth0411/payment-service:latest
                     '''
                 }
             }
@@ -45,4 +41,4 @@ pipeline {
             }
         }
     }
-}
+}}
