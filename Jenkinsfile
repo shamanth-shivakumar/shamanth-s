@@ -9,24 +9,27 @@ pipeline {
             }
         }
 
-        stage('Build User Service Image') {
+        stage('Build Docker Images') {
             steps {
-                sh 'docker build -t user-service ./user-service'
+                sh 'docker build -t shamanth/user-service ./user-service'
+                sh 'docker build -t shamanth/order-service ./order-service'
+                sh 'docker build -t shamanth/payment-service ./payment-service'
             }
         }
 
-        stage('Build Order Service Image') {
+        stage('Push Docker Images') {
             steps {
-                sh 'docker build -t order-service ./order-service'
+                sh 'docker push shamanth/user-service:latest'
+                sh 'docker push shamanth/order-service:latest'
+                sh 'docker push shamanth/payment-service:latest'
             }
         }
 
-        stage('Build Payment Service Image') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh 'docker build -t payment-service ./payment-service'
+                sh 'kubectl apply -f k8s/'
             }
         }
 
     }
 }
-
