@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_USER = "shamanth"
+    }
+
     stages {
 
         stage('Clone Repository') {
@@ -11,25 +15,34 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t shamanth/user-service ./user-service'
-                sh 'docker build -t shamanth/order-service ./order-service'
-                sh 'docker build -t shamanth/payment-service ./payment-service'
+                sh '''
+                docker build -t shamanth/user-service:latest ./user-service
+                docker build -t shamanth/order-service:latest ./order-service
+                docker build -t shamanth/payment-service:latest ./payment-service
+                '''
             }
         }
 
         stage('Push Docker Images') {
             steps {
-                sh 'docker push shamanth/user-service:latest'
-                sh 'docker push shamanth/order-service:latest'
-                sh 'docker push shamanth/payment-service:latest'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh '''
+                    echo $PASS | docker login -u $USER --password-stdin
+
+                    docker push shamanth/user-service:latest
+                    docker push shamanth/order-service:latest
+                    docker push shamanth/payment-service:latest
+                    '''
+                }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f k8s/'
+                sh '''
+                kubectl apply -f k8s/
+                '''
             }
         }
-
     }
 }
